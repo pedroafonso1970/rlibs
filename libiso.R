@@ -1,5 +1,5 @@
 #
-# libiso.R - A small library of R functions for isotonic regression, v01.1 (2022-05-06)
+# libiso.R - A small library of R functions for isotonic regression, v01.01 (2022-05-06)
 #
 # Pedro Afonso Fernandes, UCP, CLSBE, Lisbon, Portugal (paf@ucp.pt)
 # 

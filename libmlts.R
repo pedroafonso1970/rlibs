@@ -1,5 +1,5 @@
 #
-# libmlts.R - A small library of machine learning methods for time series, v01.8 (2024-04-20)
+# libmlts.R - A small library of machine learning methods for time series, v01.08 (2024-04-20)
 #
 # Pedro Afonso Fernandes, UCP, CLSBE, Lisbon, Portugal (paf@ucp.pt)
 #
