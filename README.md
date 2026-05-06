@@ -1,0 +1,6 @@
+A repository of R utilities for Economics and Data Science:
+
+- **librec.R**: the small library of recursive methods in R (librec) is a set of functions to solve sequential problems that can be represented by first-order stochastic linear difference equations and Bellman functional equations, namely, the optimal linear quadratic regulator problem (OLRP) or the Nash-Markov linear quadratic game. This library is an adaptation to R of the MatLab toolkit developed by Thomas J. Sargent, the recipient of the 2011 Nobel Prize in Economic Sciences, in the scope of the textbooks *Recursive Models of Dynamic Linear Economies* (Hansen and Sargent, 2013) and *Recursive Macroeconomic Theory* (Ljungqvist and Sargent, 2018). In addition, librec is enriched with routines to filter data (e.g. Hodrick-Prescott and Mosheiov and Raveh trend-cycle decomposition) and reinforcement learning (RL) time differences (TD) algorithms. Requires the R package 'MASS'.
+- **libmlts.R**: a small library of machine learning (ML) methods for time series (TS). Requires the R packages 'MASS', 'textir, 'gamlr', 'tree', 'kernlab', 'h2o' and 'glmnet'.
+- **libpls.R**: a small library of Partial Least Squares (PLS) methods in R. Requires the R package 'robustbase'.
+- **libiso.R**: a small library of R functions for isotonic regression. Includes a simple multicriteria algorithm.
