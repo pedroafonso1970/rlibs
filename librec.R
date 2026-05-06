@@ -1,5 +1,5 @@
 #
-# librec.R - A small library of recursive methods in R, v01.22 (2026-04-03)
+# librec.R - A small library of recursive methods in R, v01.22 (2026-04-06)
 #
 # Adaptation to R with extensions of the Thomas Sargent's MatLab toolkits available at:
 #
