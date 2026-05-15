@@ -1,5 +1,5 @@
 #
-# libiso.R - A small library of R functions for isotonic regression, v01.01 (2022-05-06)
+# libiso.R - A small library of R functions for isotonic regression, v01.02 (2026-05-15)
 #
 # Pedro Afonso Fernandes, UCP, CLSBE, Lisbon, Portugal (paf@ucp.pt)
 # 
@@ -10,29 +10,28 @@
 # General Public License for more details: https://www.gnu.org/licenses/.
 #
 
-# isofit(x,z)
+
+# isofit(x,y)
 #
-# Monotone/isotone regression of one independent variable x on z (Gebhardt, 1970).
+# Monotone/isotonic regression of one independent variable x on the 
+# the independent variable y (Gebhardt, 1970).
 #
 
-isofit <- function(x,z){
+isofit <- function(x,y){
  
   n <- length(x)      # Number of observations
   
-  if (n != length(z)) return("ERROR: x and z have different lengths!")
+  if (n != length(y)) return("ERROR: x and y have different lengths!")
    
-  dt <- cbind(x,z)    # Matrix with x and z binden in column
+  dt <- cbind(x,y)    # Matrix with x and y in column
   
   o <- order(dt[,1])  # Index with the order of x
   
-  xz <- dt[o,]        # Data matrix sorted by x
+  xy <- dt[o,]        # Data matrix sorted by x
   
-  xo <- xz[,1]        # x sorted 
-  zo <- xz[,2]        # z sorted by x 
-  
-  u <- zo             # Initializes the regression values u = z sorted (default)
+  u <- xy[,2]         # Initializes the regression values u = y sorted (default)
   m <- 1              # Initializes the size of the current (first) block
-  s <- zo[1]          # Value of the current (first) block
+  s <- u[1]           # Value of the current (first) block
   
   d     <- min(diff(u))  # Min slope of the sorted z series (should be positive)
   i     <- 1             # Number of iterations of the main algorithm
@@ -42,7 +41,7 @@ isofit <- function(x,z){
   
     for (k in 2:n){
       if(u[k] < u[k-1]){
-        # Non-monotone value of z, thus ...
+        # Non-monotone value of y, thus ...
         m <- m+1             # Increments the size of the current block
         s <- s + (u[k]-s)/m  # Updates the value (average) of the current block
         
@@ -64,6 +63,77 @@ isofit <- function(x,z){
   }
   
   aux <- list("yf" = u, "ord" = o)  # Follows the isoreg() notation from "stats"
+  
+  return(aux)
+  
+}
+
+
+# isodp(x,y)
+#
+# Unweighted isotonic L1 regression of one independent variable x on the 
+# dependent variable y by dynamic programming (Rote, 2019).
+#
+
+isodp <- function(x,y){
+  
+  n <- length(x)      # Number of observations
+  
+  if (n != length(y)) return("ERROR: x and y have different lengths!")
+  
+  dt <- cbind(x,y)    # Matrix with x and y in column
+  
+  o <- order(dt[,1])  # Index with the order of x
+  
+  xy <- dt[o,]        # Data matrix sorted by x
+  
+  yo <- xy[,2]        # y sorted by x 
+  
+  p <- rep(0,n)       # arg min of each cost-to-go function
+  z <- rep(0,n)       # Optimal solution
+  
+  n1 <- n-1
+  
+  Q <- matrix(-999999999,n+1,2) # Priority queue of breakpoints (position and value in column)
+  
+  for (k in 1:n){
+    
+    # Insert a new breakpoint with position yo[k] and value 2
+    Q[k,1] <- yo[k]
+    Q[k,2] <- 2
+    
+    # Sort the queue by position/priority (descending order)  
+    Q <- Q[order(-Q[,1]),]
+    
+    # find/peek max i.e. the breakpoint with highest position/priority (Q head)
+    B <- Q[1,2]
+    
+    if (B==1){
+      # The max is from a previous interaction, so "delete" it (pop)
+      Q[1,1] <- -999999999
+      Q[1,2] <- -999999999
+      
+      # Sort the queue by position/priority (descending order) once again
+      Q <- Q[order(-Q[,1]),]
+    }
+    else{
+      # update the value with max priority (Q head)
+      Q[1,2] <- 1
+    }
+    
+    p[k] <- Q[1,1]  # Save the highest position (arg min of k cost-to-go function)
+    
+  }
+  
+  # Compute the optimal solution
+  
+  z[n] <- p[n]
+  
+  for (i in n1:1){
+    z[i] <- min(z[i+1], p[i])
+  }
+  
+  aux <- list("yf" = z, "ord" = o)  # Follows the isoreg() notation from "stats"
   
   return(aux)
   
