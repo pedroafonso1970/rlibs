@@ -4,4 +4,4 @@ A repository of R utilities for Economics and Data Science:
 - **libmlts.R**: a small library of machine learning (ML) methods for time series (TS). Requires the R packages 'MASS', 'textir, 'gamlr', 'tree', 'kernlab', 'h2o' and 'glmnet'.
 - **libpls.R**: a small library of Partial Least Squares (PLS) methods in R. Requires the R package 'robustbase'.
 - **kernlib.R**: a small library of Kernel methods in R.
-- **libiso.R**: a small library of R functions for isotonic regression. Includes a simplified version of the multicriteria method ELECTRE and implementations of Gebhardt and Rote algorithms.
+- **libiso.R**: a small library of R functions for isotonic regression. Includes a simplified version of the multicriteria method ELECTRE, implementations of Gebhardt's and Rote's algorithms and a bivariate version of the last one.

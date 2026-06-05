@@ -1,5 +1,5 @@
 #
-# libiso.R - A small library of R functions for isotonic regression, v01.02 (2026-05-15)
+# libiso.R - A small library of R functions for isotonic regression, v01.03 (2026-06-05)
 #
 # Pedro Afonso Fernandes, UCP, CLSBE, Lisbon, Portugal (paf@ucp.pt)
 # 
@@ -127,13 +127,13 @@ isodp <- function(x,y){
   
   # Compute the optimal solution
   
-  z[n] <- p[n]
+  z[n] <- p[n]  # Terminal solution
   
   for (i in n1:1){
     z[i] <- min(z[i+1], p[i])
   }
   
-  aux <- list("yf" = z, "ord" = o)  # Follows the isoreg() notation from "stats"
+  aux <- list("yf" = z, "ord" = o, "min" = p)  # Follows the isoreg() notation from "stats"
   
   return(aux)
   
@@ -244,7 +244,7 @@ mfit <- function(X,z){
 # The ordered classes are defined as sequences between the min and max of x and y
 # using a and b, respectively, as increments or steps.
 #
-# The output can be used as input for the function biviso() from package "Iso".
+# The output can be used as input for bivdp() or biviso() from package "Iso".
 #
 
 biv <- function(x,y,z,a=1,b=1){
@@ -270,4 +270,104 @@ biv <- function(x,y,z,a=1,b=1){
   return(M)
 
 }
+
+
+# bivdp(x,y)
+#
+# Bivariate unweighted isotonic L1 regression with respect to a simple (increasing)
+# order on both variables. 
+# 
+# y is the matrix (2D grid) of observations to be isotonized.
+#
+
+bivdp <- function(y){
+  
+  m <- nrow(y)        # Number of rows
+  n <- ncol(y)        # Number of columns
+  
+  P <- matrix(0,m,n)  # arg min of each cost-to-go function
+  Z <- matrix(0,m,n)  # Optimal solution
+  
+  Q <- matrix(-999999999,m*n+1,2) # Priority queue of breakpoints (position and value in column)
+  
+  # Anti-diagonal traversal of matrix P from d = 0 up to (m+n-2)  
+  
+  k <- 1
+  
+  for (d in 0:(m+n-2)){
+    
+    i_min <- max(0, d-(n-1))
+    i_max <- min(d, m-1)
+    
+    for (i in i_min:i_max){
+      
+      j <- d-i  # NB: in anti-diagonals, we have i + j = d 
+    
+      # Insert a new breakpoint with position y[i,j] and value 2
+      Q[k,1] <- y[i+1,j+1]  # convert to 1-indexed for R
+      Q[k,2] <- 2
+      
+      # Sort the queue by position/priority (descending order)  
+      Q <- Q[order(-Q[,1]),]
+      
+      # find/peek max i.e. the breakpoint with highest position/priority (Q head)
+      B <- Q[1,2]
+      
+      if (B==1){
+        # The max is from a previous interaction, so "delete" it (pop)
+        Q[1,1] <- -999999999
+        Q[1,2] <- -999999999
+        
+        # Sort the queue by position/priority (descending order) once again
+        Q <- Q[order(-Q[,1]),]
+      }
+      else{
+        # update the value with max priority (Q head)
+        Q[1,2] <- 1
+      }
+      
+      P[i+1,j+1] <- Q[1,1]  # Save the highest position (arg min of k cost-to-go function)
+      
+      k <- k+1  # Increments the queue
+    }
+  }
+  
+  # Compute the optimal solution Z
+  
+  Z[m,n] <- P[m,n]  # Terminal solution
+  
+  for (i in (m-1):1){
+    Z[i,n] <- min(Z[i+1,n], P[i,n])  # Last column
+  }
+  
+  for (j in (n-1):1){
+    Z[m,j] <- min(Z[m,j+1], P[m,j])  # Last row
+  }
+  
+  # Anti-diagonal traversal of matrix Z's "middle" from d = (m+n-4) down to 0  
+  
+  for (d in (m+n-4):0){
+    
+    i_min <- max(0, d-(n-2))
+    i_max <- min(d, m-2)
+    
+    for (i in i_max:i_min){
+      
+      j <- d-i  # NB: in anti-diagonals, we have i + j = d
+    
+      Z[i+1,j+1] <- min(Z[i+2,j+1], Z[i+1,j+2], P[i+1,j+1])
+    }
+  
+  }
+  
+  aux <- list("yf" = Z, "min" = P)
+  
+  return(aux)
+  
+}
+
+
+
+
+
 
