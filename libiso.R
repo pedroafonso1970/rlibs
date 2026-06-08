@@ -272,7 +272,7 @@ biv <- function(x,y,z,a=1,b=1){
 }
 
 
-# bivdp(x,y)
+# bivdp(y)
 #
 # Bivariate unweighted isotonic L1 regression with respect to a simple (increasing)
 # order on both variables. 
