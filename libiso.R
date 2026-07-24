@@ -1,5 +1,5 @@
 #
-# libiso.R - A small library of R functions for isotonic regression, v01.03 (2026-06-05)
+# libiso.R - A small library of R functions for isotonic regression, v01.04 (2026-07-24)
 #
 # Pedro Afonso Fernandes, UCP, CLSBE, Lisbon, Portugal (paf@ucp.pt)
 # 
@@ -275,7 +275,7 @@ biv <- function(x,y,z,a=1,b=1){
 # bivdp(y)
 #
 # Bivariate unweighted isotonic L1 regression with respect to a simple (increasing)
-# order on both variables. 
+# order on both variables (Fernandes, 2026). 
 # 
 # y is the matrix (2D grid) of observations to be isotonized.
 #
@@ -363,6 +363,103 @@ bivdp <- function(y){
   aux <- list("yf" = Z, "min" = P)
   
   return(aux)
+  
+}
+
+
+# slogis(x)
+#
+# Computes the logistic scale parameter given a vector x using the formula: 
+# 
+# scale = sqrt(3) * StdDev / pi
+#
+
+slogis <- function(x){
+
+  scale <- sd(x) * sqrt(3) / pi
+  
+}
+
+
+# alogis(x)
+#
+# Computes the logistic correlation given two vectors x and y using the formula: 
+# 
+# alpha = cor(x,y) * pi*pi / 3
+#
+
+alogis <- function(x,y){
+  
+  alpha <- cor(x,y) * pi*pi / 3
+  
+}
+
+
+# pbivlogis(x, y, loc_x, scale_x, loc_y, scale_y)
+#
+# Standard Type I bivariate logistic distribution (Gumbel, 1961): 
+# 
+# H(x,y) = 1 / (1 + exp(-x) + exp(-y))
+#
+
+pbivlogis <- function(x, y, loc_x=0, scale_x=1, loc_y=0, scale_y=1){
+  
+  s_x <- (x - loc_x) / scale_x 
+  s_y <- (y - loc_y) / scale_y
+  
+  bivdist <- 1 / (1 + exp(-s_x) + exp(-s_y))
+
+  }
+
+
+# pbivlogisFGM(x, y, loc_x, scale_x, loc_y, scale_y, alpha)
+#
+# Standard Type II bivariate logistic distribution (Gumbel, 1961): 
+# 
+# H(x,y) = F(x) F(y) [1 + alpha (1-F(x)) (1-F(y))]
+#
+# where F(.) is the standard logistic distribution.
+#
+
+pbivlogisFGM <- function(x, y, loc_x=0, scale_x=1, loc_y=0, scale_y=1, alpha=0){
+  
+  s_x <- (x - loc_x) / scale_x 
+  s_y <- (y - loc_y) / scale_y
+  
+  F_x <- 1 / (1 + exp(-s_x))
+  F_y <- 1 / (1 + exp(-s_y))
+  
+  bivdist <- F_x * F_y * (1 + alpha * (1-F_x) *  (1-F_y))
+  
+}
+
+
+# fbivlogis(x, y, loc_x, scale_x, loc_y, scale_y, loc_z, scale_z)
+#
+# Simple forecasting of variable z conditional to the standard Type I bivariate
+# logistic distribution of x and y.
+# 
+
+fbivlogis <- function(x, y, loc_x=0, scale_x=1, loc_y=0, scale_y=1, loc_z=0, scale_z=1){
+  
+  h <- pbivlogis(x, y, loc_x, scale_x, loc_y, scale_y)
+  
+  f <- qlogis(h, location = loc_z, scale = scale_z)
+  
+}
+
+
+# fbivlogisFGM(x, y, loc_x, scale_x, loc_y, scale_y, loc_z, scale_z)
+#
+# Simple forecasting of variable z conditional to the standard Type II bivariate
+# logistic distribution of x and y.
+# 
+
+fbivlogisFGM <- function(x, y, loc_x=0, scale_x=1, loc_y=0, scale_y=1, loc_z=0, scale_z=1){
+  
+  h <- pbivlogisFGM(x, y, loc_x, scale_x, loc_y, scale_y)
+  
+  f <- qlogis(h, location = loc_z, scale = scale_z)
   
 }
 
