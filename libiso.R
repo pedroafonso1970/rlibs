@@ -446,6 +446,8 @@ fbivlogis <- function(x, y, loc_x=0, scale_x=1, loc_y=0, scale_y=1, loc_z=0, sca
   
   f <- qlogis(h, location = loc_z, scale = scale_z)
   
+  f <- f + loc_z - mean(f)  # To assure that mean(forecast) = mean(target)
+  
 }
 
 
@@ -460,6 +462,8 @@ fbivlogisFGM <- function(x, y, loc_x=0, scale_x=1, loc_y=0, scale_y=1, loc_z=0, 
   h <- pbivlogisFGM(x, y, loc_x, scale_x, loc_y, scale_y)
   
   f <- qlogis(h, location = loc_z, scale = scale_z)
+  
+  f <- f + loc_z - mean(f)  # To assure that mean(forecast) = mean(target)
   
 }
 
