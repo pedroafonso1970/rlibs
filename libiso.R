@@ -14,7 +14,7 @@
 # isofit(x,y)
 #
 # Monotone/isotonic regression of one independent variable x on the 
-# the independent variable y (Gebhardt, 1970).
+# the dependent variable y (Gebhardt, 1970).
 #
 
 isofit <- function(x,y){
@@ -269,6 +269,36 @@ biv <- function(x,y,z,a=1,b=1){
   
   return(M)
 
+}
+
+
+# bivc(y)
+#
+# Function to correct the output of biv() before applying bivdp() when we get 
+# empty values in some cells of the grid.
+#
+# It replaces the empty values of the bivariate grid y with the last values in
+# row or column, following a carry-on appending strategy (Wen and Zeng, 1999).
+#
+
+bivc <- function(y){
+
+  m <- nrow(y)        # Number of rows
+  n <- ncol(y)        # Number of columns
+
+  for (j in 1:n){
+    for (i in 2:m){
+      if (y[i,j] == 0 & y[i-1,j] != 0) y[i,j] <- y[i-1,j]
+    }
+  }
+  
+  for (i in 1:m){
+    for (j in 2:n){
+      if (y[i,j] == 0 & y[i,j-1] != 0) y[i,j] <- y[i,j-1]
+    }
+  }
+
+  return(y)
 }
 
 
